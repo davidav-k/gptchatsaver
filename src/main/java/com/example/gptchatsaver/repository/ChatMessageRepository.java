@@ -11,7 +11,12 @@ import java.util.List;
 @Repository
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
 
-    @Query(value = "SELECT * FROM chat_messages WHERE to_tsvector('russian', message) @@ plainto_tsquery(:query)",
-            nativeQuery = true)
-    List<ChatMessage> searchMessages(@Param("query") String query);
+    @Query(value = """
+        SELECT *, ts_rank(to_tsvector('russian', message), plainto_tsquery('russian', :query)) AS rank
+        FROM chat_messages
+        WHERE to_tsvector('russian', message) @@ plainto_tsquery('russian', :query)
+        ORDER BY rank DESC
+        LIMIT :limit
+    """, nativeQuery = true)
+    List<ChatMessage> searchMessages(@Param("query") String query, @Param("limit") int limit);
 }

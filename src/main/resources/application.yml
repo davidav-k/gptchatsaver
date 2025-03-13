@@ -26,11 +26,7 @@ spring:
       hibernate:
         globally_quoted_identifiers: true
         format_sql: true
-  sql:
-    init:
-      mode: never
-      continue-on-error: false
-      data-locations: classpath:/data/db_init.sql
+
   servlet:
     multipart:
       enabled: true
