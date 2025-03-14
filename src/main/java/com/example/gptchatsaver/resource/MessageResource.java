@@ -2,7 +2,7 @@ package com.example.gptchatsaver.resource;
 
 
 import com.example.gptchatsaver.entity.ChatMessage;
-import com.example.gptchatsaver.service.ChatSearchService;
+import com.example.gptchatsaver.service.impl.ChatSearchServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,15 +15,15 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping(path = "${api.endpoint.base-url}/chat")
-//@RequiredArgsConstructor
+@RequiredArgsConstructor
 public class MessageResource {
 
 
-    private final ChatSearchService chatSearchService;
+    private final ChatSearchServiceImpl chatSearchService;
 
-    public MessageResource(ChatSearchService chatSearchService) {
-        this.chatSearchService = chatSearchService;
-    }
+//    public MessageResource(ChatSearchServiceImpl chatSearchService) {
+//        this.chatSearchService = chatSearchService;
+//    }
 
     @PostMapping("/search")
     public List<ChatMessage> searchMessages(@RequestParam String query,
