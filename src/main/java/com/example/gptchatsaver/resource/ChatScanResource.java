@@ -14,10 +14,6 @@ public class ChatScanResource {
 
     private final ChatScanService chatScanService;
 
-//    public ChatScanResource(ChatScanService chatScanService) {
-//        this.chatScanService = chatScanService;
-//    }
-
     @PostMapping("/scan")
     public ResponseEntity<String> scanChat() {
         try {

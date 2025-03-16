@@ -10,7 +10,8 @@ CREATE TABLE IF NOT EXISTS chat_messages (
                                              id SERIAL PRIMARY KEY,
                                              chat_session_id INT NOT NULL REFERENCES chat_sessions(id) ON DELETE CASCADE,
                                              sender VARCHAR(255),
-                                             message TEXT NOT NULL,
+                                             question TEXT NOT NULL,
+                                             answer TEXT NOT NULL,
                                              timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -28,6 +29,6 @@ DO $$
         IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'chat_messages') THEN
             CREATE INDEX IF NOT EXISTS idx_chat_message_text
                 ON chat_messages
-                    USING GIN (to_tsvector('russian', message));
+                    USING GIN (to_tsvector('russian', answer));
         END IF;
     END $$;

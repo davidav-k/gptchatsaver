@@ -11,7 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WindowType;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -28,26 +31,48 @@ public class ChatScanServiceImpl implements ChatScanService {
     private final ChatMessageRepository chatMessageRepository;
     private final ChatSessionRepository chatSessionRepository;
 
-//    public ChatScanServiceImpl(ChatMessageRepository chatMessageRepository, ChatSessionRepository chatSessionRepository) {
-//        this.chatMessageRepository = chatMessageRepository;
-//        this.chatSessionRepository = chatSessionRepository;
-//    }
     @Override
     public void scanChat() {
-
-        WebDriverManager.chromedriver().setup();
-        WebDriver driver = new ChromeDriver();
+        // Подключаемся к уже запущенному экземпляру Chrome с отладкой на порту 9222.
+        // Необходимо, чтобы Chrome был запущен с флагом: --remote-debugging-port=9222
+        WebDriverManager.chromedriver()
+                .clearDriverCache()
+                .driverVersion("134.0.6998.89")
+                .setup();
+        ChromeOptions options = new ChromeOptions();
+        options.setExperimentalOption("debuggerAddress", "127.0.0.1:9222");
+        WebDriver driver = new ChromeDriver(options);
 
         try {
-            // Переход на страницу чата ChatGPT
-            driver.get("https://chatgpt.com/c/67d2b78a-b17c-8007-af10-3da4acc35176");
+            // Получаем список открытых окон
+            Set<String> windowHandles = driver.getWindowHandles();
+            boolean chatgptFound = false;
 
-            // Явное ожидание загрузки основного контейнера чата
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("main[role='main']")));
+            // Перебираем окна и ищем вкладку, URL которой содержит "chatgpt"
+            for (String handle : windowHandles) {
+                driver.switchTo().window(handle);
+                String currentUrl = driver.getCurrentUrl();
+                if (currentUrl.contains("chatgpt")) {
+                    chatgptFound = true;
+                    System.out.println("Найдено окно с ChatGPT: " + currentUrl);
+                    break;
+                }
+            }
+            // Если вкладка с ChatGPT не найдена, открываем новую вкладку с нужным URL
+            if (!chatgptFound) {
+                driver.switchTo().newWindow(WindowType.TAB);
+                driver.get("https://chatgpt.com/c/67d2b78a-b17c-8007-af10-3da4acc35176");
+                System.out.println("Открыта заданная вкладка с ChatGPT");
+            }
 
-            // Находим список сообщений: контейнер <ol> внутри основного элемента
-            WebElement messageList = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("main[role='main'] ol")));
+            // Явное ожидание появления элемента на странице
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+            wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("body")));
+
+            // Пример: ищем список сообщений внутри body
+            WebElement messageList = wait.until(
+                    ExpectedConditions.presenceOfElementLocated(By.cssSelector("body ol"))
+            );
             List<WebElement> messageElements = messageList.findElements(By.cssSelector("li"));
 
             // Создаем новую сессию чата
@@ -62,27 +87,30 @@ public class ChatScanServiceImpl implements ChatScanService {
             chatSession.setCreatedAt(LocalDateTime.now());
             chatSession.setAiModel(aiModel);
 
-            // Сохраняем сессию (при этом AIModel можно сохранить отдельно, если требуется)
             chatSession = chatSessionRepository.save(chatSession);
 
-            // Перебираем все найденные сообщения и сохраняем их в БД
+            // Извлечение сообщений
             for (WebElement element : messageElements) {
-                String messageText;
+                String messageTextQuestion;
+                String messageTextAnswer;
                 try {
-                    // Извлекаем текст из элемента с классом "markdown"
-                    WebElement textElement = element.findElement(By.cssSelector("div.markdown"));
-                    messageText = textElement.getText();
+                    // Попытка получить вопрос и ответ по разным селекторам
+                    WebElement textElementQ = element.findElement(By.cssSelector("div.whitespace-pre-wrap"));
+                    messageTextQuestion = textElementQ.getText();
+                    WebElement textElementA = element.findElement(By.cssSelector("div.markdown"));
+                    messageTextAnswer = textElementA.getText();
                 } catch (Exception e) {
-                    // Если не найден элемент с классом "markdown", берем текст всего элемента
-                    messageText = element.getText();
+                    // Если не удалось разделить, берем текст целиком
+                    messageTextQuestion = element.getText();
+                    messageTextAnswer = element.getText();
                 }
-                // Определяем отправителя – для примера устанавливаем значение по умолчанию
                 String sender = "ChatGPT";
 
                 ChatMessage chatMessage = new ChatMessage();
                 chatMessage.setChatSession(chatSession);
                 chatMessage.setSender(sender);
-                chatMessage.setMessage(messageText);
+                chatMessage.setQuestion(messageTextQuestion);
+                chatMessage.setAnswer(messageTextAnswer);
                 chatMessage.setTimestamp(LocalDateTime.now());
 
                 chatMessageRepository.save(chatMessage);
@@ -90,8 +118,8 @@ public class ChatScanServiceImpl implements ChatScanService {
         } catch (Exception e) {
             throw new RuntimeException("Ошибка при сканировании чата", e);
         } finally {
-            driver.quit();
+            // Не вызываем driver.quit(), чтобы не закрывать уже запущенный экземпляр Chrome,
+            // к которому мы подключились через отладку.
         }
     }
 }
-

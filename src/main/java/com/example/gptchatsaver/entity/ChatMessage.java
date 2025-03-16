@@ -23,7 +23,10 @@ public class ChatMessage {
     private String sender;
 
     @Column(columnDefinition = "TEXT")
-    private String message;
+    private String question;
+
+    @Column(columnDefinition = "TEXT")
+    private String answer;
 
     private LocalDateTime timestamp;
 }
