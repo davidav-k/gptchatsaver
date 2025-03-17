@@ -12,9 +12,9 @@ import java.util.List;
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
 
     @Query(value = """
-        SELECT *, ts_rank(to_tsvector('russian', message), plainto_tsquery('russian', :query)) AS rank
+        SELECT *, ts_rank(to_tsvector('russian', question), plainto_tsquery('russian', :query)) AS rank
         FROM chat_messages
-        WHERE to_tsvector('russian', message) @@ plainto_tsquery('russian', :query)
+        WHERE to_tsvector('russian', question) @@ plainto_tsquery('russian', :query)
         ORDER BY rank DESC
         LIMIT :limit
     """, nativeQuery = true)

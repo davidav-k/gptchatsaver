@@ -35,7 +35,17 @@ docker-compose up -d
 mvn spring-boot:run
 ```
 
-### 4. Доступ к API
+### 4. Запустите chrome с включенной отладкой:
+macOS - 
+```sh
+/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --remote-debugging-port=9222
+```
+Windows - закрыть все экземпляры Chrome и выполнить в командной строке: 
+```sh
+"C:\Program Files\Google\Chrome\Application\chrome.exe" --remote-debugging-port=9222
+```
+
+### 5. Доступ к API
 После запуска приложение будет доступно по адресу:
 - **REST API**: `http://localhost:8080/api/v1/chat`
 - **Swagger UI**: `http://localhost:8080/swagger-ui/index.html`
