@@ -1,6 +1,8 @@
 package com.example.gptchatsaver.resource;
 
 
+import com.example.gptchatsaver.dto.ChatMessageDTO;
+import com.example.gptchatsaver.dto.DTOMapper;
 import com.example.gptchatsaver.entity.ChatMessage;
 import com.example.gptchatsaver.service.impl.ChatSearchServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -21,13 +24,15 @@ public class MessageResource {
 
     private final ChatSearchServiceImpl chatSearchService;
 
-//    public MessageResource(ChatSearchServiceImpl chatSearchService) {
-//        this.chatSearchService = chatSearchService;
-//    }
 
     @PostMapping("/search")
-    public List<ChatMessage> searchMessages(@RequestParam String query,
-                                            @RequestParam(defaultValue = "10") int limit) {
-        return chatSearchService.searchMessages(query, limit);
+    public List<ChatMessageDTO> searchMessages(@RequestParam String query,
+                                               @RequestParam(defaultValue = "10") int limit) {
+        List<ChatMessage> messages = chatSearchService.searchMessages(query, limit);
+        return messages.stream()
+                .map(DTOMapper::toDTO)
+                .collect(Collectors.toList());
     }
+
+
 }

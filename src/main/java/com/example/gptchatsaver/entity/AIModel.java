@@ -9,6 +9,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class AIModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

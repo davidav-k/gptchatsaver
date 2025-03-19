@@ -1,10 +1,7 @@
 package com.example.gptchatsaver.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,6 +12,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ChatSession {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +22,7 @@ public class ChatSession {
     private LocalDateTime createdAt;
 
     @ManyToOne
-    @JoinColumn(name = "ai_model_id", nullable = false)
+    @JoinColumn(name = "id", nullable = false)
     private AIModel aiModel;
 
     @OneToMany(mappedBy = "chatSession", cascade = CascadeType.ALL)
