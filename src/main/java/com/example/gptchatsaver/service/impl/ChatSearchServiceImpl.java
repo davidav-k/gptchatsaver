@@ -16,8 +16,13 @@ public class ChatSearchServiceImpl implements ChatSearchService {
 
     @Transactional
     @Override
-    public List<ChatMessage> searchMessages(String query, int limit) {
-        return chatMessageRepository.searchMessages(query, limit);
+    public List<ChatMessage> searchQuestion(String query, int limit) {
+        return chatMessageRepository.searchQuestion(query, limit);
+    }
+
+    @Override
+    public List<ChatMessage> searchAnswer(String query, int limit) {
+        return chatMessageRepository.searchAnswer(query, limit);
     }
 
 }

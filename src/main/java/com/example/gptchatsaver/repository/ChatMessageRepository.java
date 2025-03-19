@@ -18,5 +18,15 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
         ORDER BY rank DESC
         LIMIT :limit
     """, nativeQuery = true)
-    List<ChatMessage> searchMessages(@Param("query") String query, @Param("limit") int limit);
+    List<ChatMessage> searchQuestion(@Param("query") String query, @Param("limit") int limit);
+
+    @Query(value = """
+        SELECT *, ts_rank(to_tsvector('russian', answer), plainto_tsquery('russian', :query)) AS rank
+        FROM chat_messages
+        WHERE to_tsvector('russian', answer) @@ plainto_tsquery('russian', :query)
+        ORDER BY rank DESC
+        LIMIT :limit
+    """, nativeQuery = true)
+    List<ChatMessage> searchAnswer(@Param("query") String query, @Param("limit") int limit);
+
 }

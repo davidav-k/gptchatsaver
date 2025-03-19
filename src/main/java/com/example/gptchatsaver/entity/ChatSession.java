@@ -22,7 +22,7 @@ public class ChatSession {
     private LocalDateTime createdAt;
 
     @ManyToOne
-    @JoinColumn(name = "id", nullable = false)
+    @JoinColumn(name = "ai_model_id", nullable = false)
     private AIModel aiModel;
 
     @OneToMany(mappedBy = "chatSession", cascade = CascadeType.ALL)

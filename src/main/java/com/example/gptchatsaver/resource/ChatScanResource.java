@@ -1,11 +1,20 @@
 package com.example.gptchatsaver.resource;
 
+import com.example.gptchatsaver.domen.Response;
 import com.example.gptchatsaver.service.ChatScanService;
+import com.example.gptchatsaver.utils.RequestUtils;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.net.URI;
+
+import static java.util.Collections.emptyMap;
 
 @RestController
 @RequestMapping(path = "${api.endpoint.base-url}/chat")
@@ -15,13 +24,21 @@ public class ChatScanResource {
     private final ChatScanService chatScanService;
 
     @PostMapping("/scan")
-    public ResponseEntity<String> scanChat() {
+    public ResponseEntity<Response> scanChat(HttpServletRequest request, HttpServletResponse response) {
         try {
             chatScanService.scanChat();
-            return ResponseEntity.ok("Сканирование чата завершено успешно");
+
+            return ResponseEntity.created(URI.create("")).body(RequestUtils.getResponse(
+                    request,
+                    emptyMap(),
+                    "Сканирование чата завершено успешно",
+                    HttpStatus.CREATED));
         } catch (Exception ex) {
-            ex.printStackTrace();
-            return ResponseEntity.status(500).body("Ошибка при сканировании чата: " + ex.getMessage());
+            return ResponseEntity.ok().body(RequestUtils.getErrorResponse(
+                    request,
+                    response,
+                    ex,
+                    HttpStatus.INTERNAL_SERVER_ERROR));
         }
     }
 }

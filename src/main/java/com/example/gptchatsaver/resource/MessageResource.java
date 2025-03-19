@@ -1,19 +1,24 @@
 package com.example.gptchatsaver.resource;
 
 
+import com.example.gptchatsaver.domen.Response;
 import com.example.gptchatsaver.dto.ChatMessageDTO;
 import com.example.gptchatsaver.dto.DTOMapper;
 import com.example.gptchatsaver.entity.ChatMessage;
-import com.example.gptchatsaver.service.impl.ChatSearchServiceImpl;
+import com.example.gptchatsaver.service.ChatSearchService;
+import com.example.gptchatsaver.utils.RequestUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -22,17 +27,40 @@ import java.util.stream.Collectors;
 public class MessageResource {
 
 
-    private final ChatSearchServiceImpl chatSearchService;
+    private final ChatSearchService chatSearchService;
 
 
-    @PostMapping("/search")
-    public List<ChatMessageDTO> searchMessages(@RequestParam String query,
-                                               @RequestParam(defaultValue = "10") int limit) {
-        List<ChatMessage> messages = chatSearchService.searchMessages(query, limit);
-        return messages.stream()
+    @PostMapping("/search/question")
+    public ResponseEntity<Response> searchQuestion(@RequestParam String query,
+                                                   @RequestParam(defaultValue = "10") int limit,
+                                                   HttpServletRequest request) {
+        List<ChatMessage> messages = chatSearchService.searchQuestion(query, limit);
+        List<ChatMessageDTO> messageDTOs = messages.stream()
                 .map(DTOMapper::toDTO)
-                .collect(Collectors.toList());
+                .toList();
+
+        return ResponseEntity.ok().body(RequestUtils.getResponse(
+                request,
+                Map.of("messages", messageDTOs),
+                "Found successful into database.",
+                HttpStatus.OK));
+
     }
 
+    @PostMapping("/search/answer")
+    public ResponseEntity<Response> searchAnswer(@RequestParam String query,
+                                                 @RequestParam(defaultValue = "10") int limit,
+                                                 HttpServletRequest request) {
+        List<ChatMessage> messages = chatSearchService.searchAnswer(query, limit);
+        List<ChatMessageDTO> messageDTOs = messages.stream()
+                .map(DTOMapper::toDTO)
+                .toList();
+
+        return ResponseEntity.ok().body(RequestUtils.getResponse(
+                request,
+                Map.of("messages", messageDTOs),
+                "Found successful into database.",
+                HttpStatus.OK));
+    }
 
 }
