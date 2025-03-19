@@ -7,8 +7,8 @@ import com.example.gptchatsaver.repository.AiModelRepository;
 import com.example.gptchatsaver.repository.ChatMessageRepository;
 import com.example.gptchatsaver.repository.ChatSessionRepository;
 import com.example.gptchatsaver.service.ChatScanService;
-import io.github.bonigarcia.wdm.WebDriverManager;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChatScanServiceImpl implements ChatScanService {
@@ -29,76 +30,83 @@ public class ChatScanServiceImpl implements ChatScanService {
     private final ChatSessionRepository chatSessionRepository;
     private final AiModelRepository aiModelRepository;
 
-    @Override
     public void scanChat() {
-
-        WebDriverManager.chromedriver()
-                .driverVersion("134.0.6998.89")
-                .setup();
         ChromeOptions options = new ChromeOptions();
         options.setExperimentalOption("debuggerAddress", "localhost:9222");
         WebDriver driver = new ChromeDriver(options);
 
         try {
-
-            Set<String> windowHandles = driver.getWindowHandles();
-            boolean chatgptFound = false;
-
-            for (String handle : windowHandles) {
-                driver.switchTo().window(handle);
-                String currentUrl = driver.getCurrentUrl();
-                if (currentUrl.contains("chatgpt")) {
-                    chatgptFound = true;
-                    System.out.println("Найдено окно с ChatGPT: " + currentUrl);
-                    break;
-                }
-            }
-            if (!chatgptFound) {
-                throw new RuntimeException("Не найдено окно с ChatGPT");
-            }
-
-            List<WebElement> elementVersionChats = driver.findElements(By.cssSelector("button[aria-haspopup=menu] div span"));
-
-            String sessionId = UUID.randomUUID().toString();
-            AIModel aiModel = new AIModel();
-            aiModel.setName("ChatGPT");
-            aiModel.setVersion(elementVersionChats.get(1).getText().trim());
-            aiModel.setProvider("OpenAI");
-            aiModel = aiModelRepository.save(aiModel);
-            System.out.println(aiModel);
-
-            ChatSession chatSession = new ChatSession();
-            chatSession.setSessionId(sessionId);
-            chatSession.setCreatedAt(LocalDateTime.now());
-            chatSession.setAiModel(aiModel);
-
-            chatSession = chatSessionRepository.save(chatSession);
-            System.out.println(chatSession.getSessionId());
-
-            List<WebElement> articleElements = driver.findElements(By.cssSelector("article[data-testid]"));
-            System.out.println(articleElements.size());
-
-
-            for (int i = 0; i < articleElements.size(); i += 2) {
-                WebElement questionElement = articleElements.get(i).findElement(By.xpath(".//div//div//div//div//div//div//div//div//div//div"));
-                String question = questionElement.getText();
-                WebElement answerElement = articleElements.get(i + 1).findElement(By.cssSelector("div.markdown"));
-                String answer = answerElement.getText();
-
-                ChatMessage chatMessage = new ChatMessage();
-                chatMessage.setChatSession(chatSession);
-                chatMessage.setSender("ChatGPT");
-                chatMessage.setQuestion(question);
-                chatMessage.setAnswer(answer);
-                chatMessage.setTimestamp(LocalDateTime.now());
-
-                chatMessageRepository.save(chatMessage);
-            }
+            WebDriver chatDriver = switchToChatGPTWindow(driver);
+            AIModel aiModel = createAIModel(chatDriver);
+            ChatSession chatSession = createChatSession(aiModel);
+            createChatMessages(chatDriver, chatSession);
         } catch (Exception e) {
-            throw new RuntimeException("Ошибка при сканировании чата", e);
-        } finally {
-            // Не вызываем driver.quit(), чтобы не закрывать уже запущенный экземпляр Chrome,
-            // к которому мы подключились через отладку.
+            throw new RuntimeException("Error scan chat", e);
         }
+    }
+
+    private WebDriver switchToChatGPTWindow(WebDriver driver) {
+        Set<String> windowHandles = driver.getWindowHandles();
+        for (String handle : windowHandles) {
+            driver.switchTo().window(handle);
+            String currentUrl = driver.getCurrentUrl();
+            if (currentUrl.contains("chatgpt")) {
+                log.info("Found window: {}", currentUrl);
+                return driver;
+            }
+        }
+        throw new RuntimeException("Not found ChatGPT's window");
+    }
+
+
+    private AIModel createAIModel(WebDriver driver) {
+        List<WebElement> elementVersionChats = driver.findElements(By.cssSelector("button[aria-haspopup=menu] div span"));
+        AIModel aiModel = AIModel.builder()
+                .name("ChatGPT")
+                .version(elementVersionChats.get(1).getText().trim())
+                .provider("OpenAI")
+                .build();
+        return aiModelRepository.save(aiModel);
+    }
+
+    private ChatSession createChatSession(AIModel aiModel) {
+        ChatSession chatSession = ChatSession.builder()
+                .sessionId(UUID.randomUUID().toString())
+                .aiModel(aiModel)
+                .createdAt(LocalDateTime.now())
+                .build();
+        return chatSessionRepository.save(chatSession);
+    }
+
+    private void createChatMessages(WebDriver driver, ChatSession chatSession) {
+        String titleChat = driver.findElement(By.cssSelector("title")).getText();
+        List<WebElement> articleElements = driver.findElements(By.cssSelector("article[data-testid]"));
+
+        for (int i = 0; i < articleElements.size(); i += 2) {
+            String question = articleElements.get(i)
+                    .findElement(By.xpath(".//div//div//div//div//div//div//div//div//div//div"))
+                    .getText();
+            String answer = articleElements.get(i + 1)
+                    .findElement(By.cssSelector("div.markdown"))
+                    .getText();
+
+            if (!messageExists(titleChat, question)) {
+                ChatMessage chatMessage = ChatMessage.builder()
+                        .chatSession(chatSession)
+                        .sender("ChatGPT")
+                        .title(titleChat)
+                        .question(question)
+                        .answer(answer)
+                        .timestamp(LocalDateTime.now())
+                        .build();
+                chatMessageRepository.save(chatMessage);
+            } else {
+                log.info("A message with this title and question already exists. Skipping the message.");
+            }
+        }
+    }
+
+    private boolean messageExists(String title, String question) {
+        return chatMessageRepository.existsByTitleAndQuestion(title, question);
     }
 }

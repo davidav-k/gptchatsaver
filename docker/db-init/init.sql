@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS chat_messages (
                                              id SERIAL PRIMARY KEY,
                                              chat_session_id INT NOT NULL REFERENCES chat_sessions(id) ON DELETE CASCADE,
                                              sender VARCHAR(255),
+                                             title VARCHAR(255),
                                              question TEXT NOT NULL,
                                              answer TEXT NOT NULL,
                                              timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP

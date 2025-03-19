@@ -22,6 +22,7 @@ public class ChatMessage {
     private ChatSession chatSession;
 
     private String sender;
+    private String title;
 
     @Column(columnDefinition = "TEXT")
     private String question;

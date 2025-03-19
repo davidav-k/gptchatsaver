@@ -29,4 +29,8 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
     """, nativeQuery = true)
     List<ChatMessage> searchAnswer(@Param("query") String query, @Param("limit") int limit);
 
+    boolean existsByTitleAndQuestion(String title, String question);
+
+
+
 }
