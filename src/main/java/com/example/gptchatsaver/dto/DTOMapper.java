@@ -29,6 +29,7 @@ public class DTOMapper {
                 .title(chatMessage.getTitle())
                 .question(chatMessage.getQuestion())
                 .answer(chatMessage.getAnswer())
+                .answerHtml(chatMessage.getAnswerHtml())
                 .timestamp(chatMessage.getTimestamp())
                 .build();
     }

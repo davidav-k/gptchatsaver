@@ -7,9 +7,11 @@ import com.example.gptchatsaver.repository.AiModelRepository;
 import com.example.gptchatsaver.repository.ChatMessageRepository;
 import com.example.gptchatsaver.repository.ChatSessionRepository;
 import com.example.gptchatsaver.service.ChatScanService;
+import io.github.bonigarcia.wdm.WebDriverManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -31,6 +34,7 @@ public class ChatScanServiceImpl implements ChatScanService {
     private final AiModelRepository aiModelRepository;
 
     public void scanChat() {
+        WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
         options.setExperimentalOption("debuggerAddress", "localhost:9222");
         WebDriver driver = new ChromeDriver(options);
@@ -88,7 +92,12 @@ public class ChatScanServiceImpl implements ChatScanService {
                     .getText();
             String answer = articleElements.get(i + 1)
                     .findElement(By.cssSelector("div.markdown"))
-                    .getText();
+                    .getText()
+                    .replaceAll("\\s+", " ");
+            String answerHtml = Objects.requireNonNull(articleElements.get(i + 1)
+                            .findElement(By.cssSelector("div.markdown"))
+                            .getAttribute("outerHTML"))
+                    .replaceAll("\\s+", " ");
 
             if (!messageExists(titleChat, question)) {
                 ChatMessage chatMessage = ChatMessage.builder()
@@ -97,11 +106,12 @@ public class ChatScanServiceImpl implements ChatScanService {
                         .title(titleChat)
                         .question(question)
                         .answer(answer)
+                        .answerHtml(answerHtml)
                         .timestamp(LocalDateTime.now())
                         .build();
                 chatMessageRepository.save(chatMessage);
             } else {
-                log.info("A message with this title and question already exists. Skipping the message.");
+                log.info("Сообщение уже существует. Пропуск.");
             }
         }
     }

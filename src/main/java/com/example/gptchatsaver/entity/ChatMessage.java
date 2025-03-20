@@ -24,13 +24,14 @@ public class ChatMessage {
     private String sender;
     private String title;
 
-    @Lob
     @Column(columnDefinition = "TEXT")
     private String question;
 
-    @Lob
     @Column(columnDefinition = "TEXT")
     private String answer;
+
+    @Column(columnDefinition = "TEXT")
+    private String answerHtml;
 
     private LocalDateTime timestamp;
 }

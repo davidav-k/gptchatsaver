@@ -17,6 +17,7 @@ public class ChatMessageDTO {
     private String title;
     private String question;
     private String answer;
+    private String answerHtml;
     private LocalDateTime timestamp;
 }
 
