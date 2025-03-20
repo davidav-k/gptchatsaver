@@ -79,7 +79,7 @@ public class ChatScanServiceImpl implements ChatScanService {
     }
 
     private void createChatMessages(WebDriver driver, ChatSession chatSession) {
-        String titleChat = driver.findElement(By.cssSelector("title")).getText();
+        String titleChat = driver.getTitle();
         List<WebElement> articleElements = driver.findElements(By.cssSelector("article[data-testid]"));
 
         for (int i = 0; i < articleElements.size(); i += 2) {

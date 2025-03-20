@@ -34,6 +34,7 @@ public class MessageResource {
     public ResponseEntity<Response> searchQuestion(@RequestParam String query,
                                                    @RequestParam(defaultValue = "10") int limit,
                                                    HttpServletRequest request) {
+        log.info("Start search question: {}", query);
         List<ChatMessage> messages = chatSearchService.searchQuestion(query, limit);
         List<ChatMessageDTO> messageDTOs = messages.stream()
                 .map(DTOMapper::toDTO)
@@ -51,6 +52,7 @@ public class MessageResource {
     public ResponseEntity<Response> searchAnswer(@RequestParam String query,
                                                  @RequestParam(defaultValue = "10") int limit,
                                                  HttpServletRequest request) {
+        log.info("Start search answer: {}", query);
         List<ChatMessage> messages = chatSearchService.searchAnswer(query, limit);
         List<ChatMessageDTO> messageDTOs = messages.stream()
                 .map(DTOMapper::toDTO)
