@@ -1,42 +1,44 @@
-# scripts/menu.ps1 — интерактивное меню управления GPTChatSaver
+# Interactive project menu for GPTChatSaver (PowerShell, English, fixed "exit")
 
 function Show-Menu {
     Clear-Host
-    Write-Host "===== GPTChatSaver Меню управления (PowerShell) ====="
-    Write-Host "1. Запустить базу данных (docker-up)"
-    Write-Host "2. Остановить базу данных (docker-down)"
-    Write-Host "3. Сбросить БД и инициализировать заново (db-reset)"
-    Write-Host "4. Создать бэкап базы данных"
-    Write-Host "5. Восстановить базу данных из последнего архива"
-    Write-Host "6. Проверить, кто использует порт 8080"
-    Write-Host "7. Завершить процесс на порту 8080"
-    Write-Host "8. Открыть Swagger UI"
-    Write-Host "9. Запустить Chrome с remote-debugging"
-    Write-Host "0. Выход"
-    Write-Host "======================================================"
+    Write-Host "===== GPTChatSaver Project Menu (PowerShell) ====="
+    Write-Host "1. Start PostgreSQL database (docker-up)"
+    Write-Host "2. Stop PostgreSQL database (docker-down)"
+    Write-Host "3. Reset DB volume and reinitialize (db-reset)"
+    Write-Host "4. Backup the database"
+    Write-Host "5. Restore the database from the last archive"
+    Write-Host "6. Check which process uses port 8080"
+    Write-Host "7. Kill the process on port 8080"
+    Write-Host "8. Open Swagger UI"
+    Write-Host "9. Launch Chrome with remote debugging"
+    Write-Host "0. Exit"
+    Write-Host "==================================================="
 }
 
-do {
+$exit = $false
+
+while (-not $exit) {
     Show-Menu
-    $choice = Read-Host "Выберите действие"
+    $choice = Read-Host "Enter your choice"
 
     switch ($choice) {
-        '1' { make docker-up; pause }
-        '2' { make docker-down; pause }
-        '3' { make db-reset; pause }
-        '4' { make backup; pause }
-        '5' { make restore; pause }
-        '6' { make port-check; pause }
-        '7' { make kill; pause }
-        '8' { make swagger; pause }
-        '9' { make chrome; pause }
+        '1' { .\Makefile.bat docker-up; pause }
+        '2' { .\Makefile.bat docker-down; pause }
+        '3' { .\Makefile.bat db-reset; pause }
+        '4' { .\Makefile.bat backup; pause }
+        '5' { .\Makefile.bat restore; pause }
+        '6' { .\Makefile.bat port-check; pause }
+        '7' { .\Makefile.bat kill; pause }
+        '8' { .\Makefile.bat swagger; pause }
+        '9' { .\Makefile.bat chrome; pause }
         '0' {
-            Write-Host "👋 До встречи!"
-            break
+            Write-Host "Goodbye!"
+            $exit = $true
         }
         default {
-            Write-Host "❌ Неверный выбор!" -ForegroundColor Red
+            Write-Host "Invalid selection!" -ForegroundColor Red
             pause
         }
     }
-} while ($true)
+}
