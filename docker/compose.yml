@@ -1,6 +1,6 @@
 services:
   postgresdb:
-    container_name: postgresdb
+    container_name: gptchatsaver_db
     image: postgres:16.1
     restart: always
     environment:
@@ -13,8 +13,8 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
-      - ./db-init:/docker-entrypoint-initdb.d
+      - ../docker/pgdata:/var/lib/postgresql/data
+      - ../docker/db-init:/docker-entrypoint-initdb.d
 
 volumes:
   pgdata:
