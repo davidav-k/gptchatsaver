@@ -2,12 +2,12 @@
 $timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm-ss"
 $backupDir = "backup"
 $dataDir = "docker/pgdata"
-$backupFile = "$backupDir/pgdata_backup_$timestamp.zip"
+$backupFile = "$backupDir/gptchat_backup_$timestamp.zip"
 
-Write-Host "📦 Создание резервной копии..."
+Write-Host "Creating a backup copy..."
 
 if (-Not (Test-Path $dataDir)) {
-    Write-Error "Папка данных $dataDir не найдена"
+    Write-Error "Folder data $dataDir not found"
     exit 1
 }
 
@@ -17,4 +17,4 @@ if (-Not (Test-Path $backupDir)) {
 
 Compress-Archive -Path "$dataDir\*" -DestinationPath $backupFile -Force
 
-Write-Host "Бэкап сохранён: $backupFile"
+Write-Host "Backup saved: $backupFile"

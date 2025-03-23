@@ -13,7 +13,8 @@ if "%CMD%"=="docker-down" (
 
 if "%CMD%"=="db-reset" (
     docker-compose --env-file .env -f docker/compose.yml down -v
-    docker-compose --env-file .env -f docker/compose.yml up -d
+    rmdir /S /Q docker\pgdata
+    echo Database reset completed
     goto end
 )
 

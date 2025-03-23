@@ -2,12 +2,12 @@
 $backupDir = "backup"
 $dataDir = "docker/pgdata"
 
-Write-Host "Восстановление базы данных..."
+Write-Host "Recovery from the last backup..."
 
 $lastBackup = Get-ChildItem "$backupDir\pgdata_backup_*.zip" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
 
 if (-Not $lastBackup) {
-    Write-Error "Бэкап не найден"
+    Write-Error "Backup file not found"
     exit 1
 }
 
@@ -18,4 +18,4 @@ if (Test-Path $dataDir) {
 New-Item -ItemType Directory -Path $dataDir | Out-Null
 Expand-Archive -Path $lastBackup.FullName -DestinationPath $dataDir -Force
 
-Write-Host "Восстановление завершено из: $($lastBackup.Name)"
+Write-Host "Recovery completed from: $($lastBackup.Name)"

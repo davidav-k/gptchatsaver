@@ -5,7 +5,7 @@ function Show-Menu {
     Write-Host "===== GPTChatSaver Project Menu (PowerShell) ====="
     Write-Host "1. Start PostgreSQL database (docker-up)"
     Write-Host "2. Stop PostgreSQL database (docker-down)"
-    Write-Host "3. Reset DB volume and reinitialize (db-reset)"
+    Write-Host "3. Reset DB volume"
     Write-Host "4. Backup the database"
     Write-Host "5. Restore the database from the last archive"
     Write-Host "6. Check which process uses port 8080"
