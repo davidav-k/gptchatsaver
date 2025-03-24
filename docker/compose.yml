@@ -1,6 +1,6 @@
 services:
   postgresdb:
-    container_name: gptchatsaver_db
+    container_name: ${POSTGRES_CONTAINER}
     image: postgres:16.1
     restart: always
     environment:

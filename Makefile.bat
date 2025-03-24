@@ -12,9 +12,9 @@ if "%CMD%"=="docker-down" (
 )
 
 if "%CMD%"=="db-reset" (
-    docker-compose --env-file .env -f docker/compose.yml down -v
-    rmdir /S /Q docker\pgdata
-    echo Database reset completed
+    docker-compose --env-file .env -f docker/compose.yml down
+    echo Deleting local pgdata...
+    rmdir /S /Q docker\\pgdata
     goto end
 )
 
@@ -53,9 +53,13 @@ if "%CMD%"=="kill" (
     goto end
 )
 
+if "%CMD%"=="run" (
+    spring-boot:run
+    goto end
+)
 
 echo Unknown command: %CMD%
-echo Supported commands:
+echo Available commands:
 echo docker-up, docker-down, db-reset, backup, restore, swagger, chrome, psmenu, port-check, kill
 
 :end

@@ -1,20 +1,20 @@
-# backup/backup.ps1
+# backup/backup.ps1 — PostgreSQL backup
+
 $timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm-ss"
 $backupDir = "backup"
-$dataDir = "docker/pgdata"
-$backupFile = "$backupDir/gptchat_backup_$timestamp.zip"
+$backupFile = "$backupDir/gptchat_backup_$timestamp.sql"
 
-Write-Host "Creating a backup copy..."
+$dbUser = "user"
+$dbName = "gptchatsaver_db"
+$container = "gptchatsaver"
 
-if (-Not (Test-Path $dataDir)) {
-    Write-Error "Folder data $dataDir not found"
-    exit 1
-}
+Write-Host "Creating PostgreSQL dump..."
 
 if (-Not (Test-Path $backupDir)) {
     New-Item -ItemType Directory -Path $backupDir | Out-Null
 }
 
-Compress-Archive -Path "$dataDir\*" -DestinationPath $backupFile -Force
+$cmd = "docker exec $container pg_dump -U $dbUser --clean $dbName > `"$backupFile`""
+cmd.exe /c $cmd
 
-Write-Host "Backup saved: $backupFile"
+Write-Host "Backup saved to:" $backupFile

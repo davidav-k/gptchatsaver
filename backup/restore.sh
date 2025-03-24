@@ -1,38 +1,20 @@
 #!/bin/bash
-# backup/restore.sh
-# скрипт восстановления данных из бэкапа
+# backup/restore.sh — Restore PostgreSQL from latest SQL dump
 
-set -e
+backup_dir="backup"
+db_user="user"
+db_name="gptchatsaver_db"
+container="gptchatsaver"
 
-BACKUP_DIR="./backup"
-DATA_DIR="./docker/pgdata"
+echo "Restoring PostgreSQL data..."
 
-echo "⚠️  Восстановление приведёт к потере текущих данных!"
-read -p "Продолжить? (yes/no): " confirm
-if [ "$confirm" != "yes" ]; then
-  echo "❌ Отменено."
+last_backup=$(ls -t "$backup_dir"/gptchat_backup_*.sql 2>/dev/null | head -n 1)
+
+if [ -z "$last_backup" ]; then
+  echo "No backup file found."
   exit 1
 fi
 
-echo "Остановка контейнера PostgreSQL (если запущен)..."
-docker stop postgresdb 2>/dev/null || true
+docker exec -i "$container" psql -U "$db_user" -d "$db_name" < "$last_backup"
 
-echo "Очистка текущей директории данных..."
-rm -rf "$DATA_DIR"
-mkdir -p "$DATA_DIR"
-
-echo "Список доступных бэкапов:"
-ls "$BACKUP_DIR"/pgdata_backup_*.tar.gz || true
-echo ""
-read -p "Введите имя файла бэкапа (например: pgdata_backup_2025-03-21_14-30-00.tar.gz): " BACKUP_FILE
-
-if [ ! -f "$BACKUP_DIR/$BACKUP_FILE" ]; then
-  echo "❌ Файл $BACKUP_FILE не найден в $BACKUP_DIR"
-  exit 1
-fi
-
-echo "Распаковка бэкапа..."
-tar -xzf "$BACKUP_DIR/$BACKUP_FILE" -C "$DATA_DIR"
-
-echo "✅ Восстановление завершено. Запусти контейнер:"
-echo "   docker-compose up -d"
+echo "Restore completed from: $last_backup"

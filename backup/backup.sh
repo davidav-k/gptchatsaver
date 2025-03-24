@@ -1,22 +1,16 @@
 #!/bin/bash
-# backup/backup.sh
-#  Скрипт создает архив с данными PostgreSQL и сохраняет его в директории  backup
-set -e
+# backup/backup.sh — PostgreSQL backup using pg_dump
 
-BACKUP_DIR="./backup"
-DATA_DIR="./docker/pgdata"
-TIMESTAMP=$(date +%F_%H-%M-%S)
-BACKUP_FILE="$BACKUP_DIR/pgdata_backup_$TIMESTAMP.tar.gz"
+timestamp=$(date +%Y-%m-%d_%H-%M-%S)
+backup_dir="backup"
+backup_file="$backup_dir/gptchat_backup_$timestamp.sql"
+db_user="user"
+db_name="gptchatsaver_db"
+container="gptchatsaver"
 
-echo "Создание бэкапа PostgreSQL данных..."
-mkdir -p "$BACKUP_DIR"
+echo "Creating PostgreSQL dump..."
 
-if [ ! -d "$DATA_DIR" ]; then
-  echo "❌ Директория данных PostgreSQL ($DATA_DIR) не найдена."
-  exit 1
-fi
+mkdir -p "$backup_dir"
+docker exec "$container" pg_dump -U "$db_user" --clean "$db_name" > "$backup_file"
 
-tar -czf "$BACKUP_FILE" -C "$DATA_DIR" .
-echo "✅ Бэкап сохранён в $BACKUP_FILE"
-
-
+echo "Backup saved to: $backup_file"

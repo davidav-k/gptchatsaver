@@ -1,13 +1,13 @@
-# Interactive project menu for GPTChatSaver (PowerShell, English, fixed "exit")
+# scripts/menu.ps1 — Interactive project menu (PowerShell version)
 
 function Show-Menu {
     Clear-Host
     Write-Host "===== GPTChatSaver Project Menu (PowerShell) ====="
-    Write-Host "1. Start PostgreSQL database (docker-up)"
-    Write-Host "2. Stop PostgreSQL database (docker-down)"
+    Write-Host "1. Start PostgreSQL database"
+    Write-Host "2. Stop PostgreSQL database"
     Write-Host "3. Reset DB volume"
     Write-Host "4. Backup the database"
-    Write-Host "5. Restore the database from the last archive"
+    Write-Host "5. Restore the database from last backup"
     Write-Host "6. Check which process uses port 8080"
     Write-Host "7. Kill the process on port 8080"
     Write-Host "8. Open Swagger UI"

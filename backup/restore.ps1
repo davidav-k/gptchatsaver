@@ -1,21 +1,21 @@
-# backup/restore.ps1
+# restore.ps1 — restore PostgreSQL from latest SQL dump using hardcoded values
+
 $backupDir = "backup"
-$dataDir = "docker/pgdata"
+$dbUser = "user"
+$dbName = "gptchatsaver_db"
+$container = "gptchatsaver"
 
-Write-Host "Recovery from the last backup..."
+Write-Host "Restoring PostgreSQL data..."
 
-$lastBackup = Get-ChildItem "$backupDir\pgdata_backup_*.zip" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+$lastBackup = Get-ChildItem "$backupDir\gptchat_backup_*.sql" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
 
 if (-Not $lastBackup) {
-    Write-Error "Backup file not found"
+    Write-Error "No backup file found."
     exit 1
 }
 
-if (Test-Path $dataDir) {
-    Remove-Item -Recurse -Force $dataDir
-}
+$backupFilePath = $lastBackup.FullName
+$cmd = "docker exec -i $container psql -U $dbUser -d $dbName < `"$backupFilePath`""
+cmd.exe /c $cmd
 
-New-Item -ItemType Directory -Path $dataDir | Out-Null
-Expand-Archive -Path $lastBackup.FullName -DestinationPath $dataDir -Force
-
-Write-Host "Recovery completed from: $($lastBackup.Name)"
+Write-Host "Restore completed from:" $lastBackup.Name
