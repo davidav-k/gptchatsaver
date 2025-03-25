@@ -16,13 +16,10 @@ prepare:
 	chmod +x scripts/menu.sh
 
 backup: prepare
-	docker exec postgresdb pg_dump -U user gptchatsaver_db > backup/gptchat_backup_$(shell date +%Y-%m-%d_%H-%M-%S).sql
+	./$(BACKUP_DIR)/backup.sh
 
 restore: prepare
-	@echo "Restoring from latest SQL dump..."
-	@last=$(shell ls -1t backup/gptchat_backup_*.sql | head -n 1); \
-	echo "Using backup file: $$last"; \
-	docker exec -i postgresdb psql -U user -d gptchatsaver_db < $$last
+	./$(BACKUP_DIR)/restore.sh
 
 docker-up:
 	docker-compose --env-file .env -f docker/compose.yml up -d
@@ -32,7 +29,7 @@ docker-down:
 
 db-reset:
 	docker-compose --env-file .env -f docker/compose.yml down -v
-
+	rm -rf $(DATA_DIR)
 swagger:
 	xdg-open $(SWAGGER_URL) 2>/dev/null || open $(SWAGGER_URL)
 

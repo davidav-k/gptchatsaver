@@ -18,7 +18,7 @@ show_menu() {
 
 while true; do
   show_menu
-  read -p "Выберите действие: " choice
+  read -p "Enter your choice: " choice
   case $choice in
     1) make docker-up ;;
     2) make docker-down ;;
@@ -29,7 +29,7 @@ while true; do
     7) make swagger ;;
     8) make chrome ;;
     9) make kill ;;
-    0) echo "До встречи!"; exit 0 ;;
-    *) echo "Неверный выбор!" ;;
+    0) echo "Goodbye!"; exit 0 ;;
+    *) echo "Invalid selection!" ;;
   esac
 done
