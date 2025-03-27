@@ -1,53 +1,48 @@
 # GPTChatSaver
 
-**GPTChatSaver** — это приложение, 
-которое автоматически извлекает содержимое беседы с ChatGPT 
-из вкладки браузера (Chrome) и сохраняет в локальную базу данных PostgreSQL
-с дальнейшим доступом к ней через REST API.
-
-
-**Примечание: приложение находится в стадии разработки и тестирования, но основной функционал работает.**
+**GPTChatSaver** is an application that
+automatically extracts the contents of a ChatGPT conversation
+from a browser tab (Chrome) and saves it to a local PostgreSQL database
+with further access to it via API.
 
 ---
 
-## Функциональность
+## Functionality
 
-- Извлечение сообщений с помощью Selenium WebDriver из вкладки ChatGPT
-- Сохранение вопросов и ответов в локальную базу PostgreSQL
-- REST API для поиска и фильтрации сообщений в базе данных 
-- Документация через Swagger UI
-- Резервное копирование и восстановление базы данных
-- CLI меню для управления приложением и базой данных (для Windows и Unix)
+- Extracting messages using Selenium WebDriver from the ChatGPT tab
+- Saving questions and answers to a local PostgreSQL database
+- REST API for searching and filtering messages in the database
+- Backup and restore of the database
+- CLI menu for managing the application and database (for Windows and Unix)
 
 ---
 
-## Стек технологий
+## Technology stack
 
 - **Java 21**, **Spring Boot 3**, **Spring Data JPA**
-- **PostgreSQL** (через Docker)
+- **PostgreSQL** (via Docker)
 - **Selenium WebDriver**
-- **Swagger UI**
 - **Docker + Docker Compose**
-- **PowerShell (Windows)** и **Makefile (Unix/macOS/WSL)**
+- **PowerShell (Windows)** and **Makefile (Unix/macOS/WSL)**
 
 ---
 
-## Установка и настройка
+## Installation and configuration
 
-### Требования:
->Windows 
->- Docker Desktop установлен и запущен
->- Google Chrome установлен (`C:\Program Files\Google\Chrome\Application\chrome.exe`)
->- PowerShell 5+ или 7+
+### Requirements:
+>Windows
+>- Docker Desktop installed and running
+>- Google Chrome installed (`C:\Program Files Files\Google\Chrome\Application\chrome.exe`)
+>- PowerShell 5+ or 7+
 
->MacOS или Unix
->- Docker и Docker Compose
+>MacOS or Unix
+>- Docker and Docker Compose
 >- Google Chrome
 >- GNU Make
 
-PostgreSQL будет работать в Docker-контейнере
+PostgreSQL will run in a Docker container
 
-#### 1. Клонирование проекта
+#### 1. Project cloning
 
 ```bash
 git clone https://github.com/davidav-k/gptchatsaver.git
@@ -55,7 +50,7 @@ git clone https://github.com/davidav-k/gptchatsaver.git
 
 ---
 
-#### 2. Запуск меню управления
+#### 2. Launching the control menu
 #### Windows:
 ```powershell
 .\Makefile.bat psmenu
@@ -63,70 +58,69 @@ git clone https://github.com/davidav-k/gptchatsaver.git
 #### MacOS:
 ```bash
 make menu
-``` 
+```
 
-#### 3.  В меню - `Start the database`
+#### 3. In the menu - `Start the database`
 
-#### 4.  В меню - `Start Chrome with --remote-debugging`
+#### 4. In the menu - `Start Chrome with --remote-debugging`
 
-#### 5.  В chrome - открыть интересующую вкладку ChatGPT
+#### 5. In chrome - open the desired ChatGPT tab
 
-#### 6.  Запустить приложение
+#### 6. Launch the application
 
 ---
 
-###  Доступ к API
+### API access
 
 - **API**: `http://localhost:8080/api/v1/chat`
-- **Swagger UI**: `http://localhost:8080/swagger-ui/index.html`
 
 ---
 
-#### API Эндпоинты
+#### API Endpoints
 
-| Метод | Эндпоинт                       | Описание                                |
+| Method | Endpoint | Description |
 | ----- | ------------------------------ |-----------------------------------------|
-| POST  | `/search/question` | Поиск в истории чатов среди вопросов                |
-| POST  | `/search/answer`   | Поиск в истории чатов среди ответов                 |
-| POST  | `/save`            | Сохранение в базу чата из активной вкладки Chrome   |
+| POST | `/search/question` | Search in chat history among questions |
+| POST | `/search/answer` | Search in chat history among answers |
+| POST | `/save` | Save to the chat database from the active Chrome tab |
 
 ---
 
-### Автоматизация
+### Automation
 
-В корне находится `Makefile`(macOS) и `Makefile.bat`(Windows) содержащие команды упрощающие работу.
+At the root there is `Makefile` (macOS) and `Makefile.bat` (Windows) containing commands that simplify the work.
 
-#### Поддерживаемые команды (macOS)
+#### Supported commands (macOS)
 
-| Команда            | Описание                                      |
-|--------------------|-----------------------------------------------|
-| `make docker-up`   | Запуск контейнера PostgreSQL (Docker Compose) |
-| `make docker-down` | Остановка контейнера PostgreSQL               |
-| `make db-reset`    | !!! Сброс volume !!!                          |
-| `make backup`      | Создание резервной копии БД                   |
-| `make restore`     | Восстановление данных БД из последнего архива |
-| `make swagger`     | Открытие Swagger UI в браузере                |
-| `make chrome`      | Запуск Chrome с remote debugging (порт 9222)  |
-| `make port-check`  | Проверка, кто использует порт 8080            |
-| `make kill`        | Завершение процесса, занятого портом 8080     |
-| `make menu`        | CLI меню                                      |
-| `make prepare`     | Назначение прав на выполнение скриптов        |
-| `make run`         | Запуск приложения                             |
-| `make stop`        | Остановка приложения *                        |
-| `make clean`       | Очистка проекта (удаление target и log)       |
-| `make build`       | Сборка проекта                                |
-| `make test`        | Запуск тестов *                               |
-| `make help`        | Справка по командам *                         |
+| Command | Description |
+|--------------------|----------------------------------------------|
+| `make docker-up` | Start a PostgreSQL container (Docker Compose) |
+| `make docker-down` | Stop a PostgreSQL container |
+| `make db-reset` | !!! Reset volume !!! |
+| `make backup` | Create a backup copy of the database |
+| `make restore` | Restore database data from the latest archive |
+| `make swagger` | Open Swagger UI in a browser |
+| `make chrome` | Start Chrome with remote debugging (port 9222) |
+| `make port-check` | Check who is using port 8080 |
+| `make kill` | Kill the process using port 8080 |
+| `make menu` | CLI menu |
+| `make prepare` | Assigning permissions to execute scripts |
+| `make run` | Run the application |
+| `make stop` | Stop the application * |
+| `make clean` | Clean the project (remove targets and logs) |
+| `make build` | Build the project |
+| `make test` | Run tests * |
+| `make help` | Help on commands * |
 
-* - в разработке
+* - in development
 
 ---
 
-### Переменные окружения (`.env`)
+### Environment variables (`.env`)
 
-В проекте используется файл `.env` в корне для настройки окружения:
+The project uses the `.env` file in the root to configure the environment:
 
-#### Пример `.env`
+#### Example `.env`
 
 ```dotenv
 POSTGRES_USER=user
@@ -140,52 +134,37 @@ POSTGRES_CONTAINER=postgresdb
 
 ## Git hook: pre-commit
 
-В проекте используется `pre-commit` hook для автоустановки прав исполнения на скрипты:
+The project uses the `pre-commit` hook to automatically set execution rights for scripts:
 
 ```bash
 .git/hooks/pre-commit
 ```
 
-После клонирования репозитория выполнить:
+After cloning the repository, run:
 
 ```bash
 chmod +x .git/hooks/pre-commit
 ```
 
-
 ---
-## Структура проекта
+## Project structure
 
 ```
 gptchatsaver/
 ├── .git/
-│   └── hooks/
-│       └── pre-commit      ← git hook
+│ └── hooks/
+│ └── pre-commit ← git hook
 ├── backup/
-│   ├── backup.ps1          ← бэкап Windows
-│   ├── restore.ps1         ← восстановление Windows
-│   ├── backup.sh           ← бекап Unix/macOS
-│   └── restore.sh          ← восстановление Unix/macOS
+│ ├── backup.ps1 ← Windows backup
+│ ├── restore.ps1 ← Windows restore
+│ ├── backup.sh ← Unix/macOS backup
+│ └── restore.sh ← Unix/macOS restore
 ├── docker/
-│   ├── compose.yml         ← контейнер PostgreSQL
-│   ├── db-init/init.sql    ← скрипт инициализации БД
-    └── pgdata/             ← база данных PostgreSQL
+│ ├── compose.yml ← PostgreSQL container
+│ ├── db-init/init.sql ← DB initialization script
+└── pgdata/ ← PostgreSQL database
 ├── scripts/
-│   └── menu.ps1            ← CLI меню Windows
-│   └── menu.sh             ← CLI меню Unix/macOS
-├── Makefile                ← автоматизация Unix/macOS
-├── Makefile.bat            ← автоматизация Windows
-├── .env                    ← переменные окружения 
-```
-
----
-
-
-### Важно
-
-- Бэкап/восстановление работают **только если контейнер PostgreSQL запущен в docker**
-
-
----
-
-**© 2025 GPTChatSaver. Все права защищены.**
+│ └── menu.ps1 ← Windows CLI menu
+│ └── menu.sh ← Unix/macOS CLI menu
+├── Makefile ← Unix/macOS automation
+├── Makefile.bat
