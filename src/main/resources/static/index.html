@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>GPTChatSaver API UI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<h1>GPTChatSaver API UI</h1>
+
+<h2>Поиск по вопросам</h2>
+<label for="questionInput"></label><input type="text" id="questionInput" placeholder="Введите фразу из вопроса...">
+<button onclick="searchQuestion()">Искать</button>
+
+<h2>Поиск по ответам</h2>
+<label for="answerInput"></label><input type="text" id="answerInput" placeholder="Введите фразу из ответа...">
+<button onclick="searchAnswer()">Искать</button>
+
+<h2>Сохранить текущую сессию из Chrome</h2>
+<button onclick="saveChat()">Сохранить</button>
+
+<div id="status"></div>
+
+<h3>Результаты:</h3>
+<pre id="output"></pre>
+
+<script>
+    const API_BASE = 'http://localhost:8080/api/v1/chat';
+    const statusDiv = document.getElementById('status');
+    const outputDiv = document.getElementById('output');
+
+    function setStatus(text, type = '') {
+        statusDiv.textContent = text;
+        statusDiv.className = type;
+    }
+
+    async function searchQuestion() {
+        const query = document.getElementById('questionInput').value;
+        setStatus('Ищем в вопросах...', 'loading');
+        try {
+            const res = await fetch(`${API_BASE}/search/question`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query })
+            });
+            const json = await res.json();
+            outputDiv.textContent = JSON.stringify(json, null, 2);
+            setStatus('Найдено!', 'success');
+        } catch (err) {
+            setStatus('Ошибка при поиске', 'error');
+            outputDiv.textContent = err.toString();
+        }
+    }
+
+    async function searchAnswer() {
+        const query = document.getElementById('answerInput').value;
+        setStatus('Ищем в ответах...', 'loading');
+        try {
+            const res = await fetch(`${API_BASE}/search/answer`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query })
+            });
+            const json = await res.json();
+            outputDiv.textContent = JSON.stringify(json, null, 2);
+            setStatus('Найдено!', 'success');
+        } catch (err) {
+            setStatus('Ошибка при поиске', 'error');
+            outputDiv.textContent = err.toString();
+        }
+    }
+
+    async function saveChat() {
+        setStatus('Сохраняем чат из Chrome...', 'loading');
+        try {
+            const res = await fetch(`${API_BASE}/scan`, {
+                method: 'POST'
+            });
+
+            if (res.ok) {
+                const json = await res.json();
+                outputDiv.textContent = 'Сессия сохранена:\n' + JSON.stringify(json, null, 2);
+                setStatus('Чат успешно сохранён!', 'success');
+            } else {
+                const errorText = await res.text();
+                outputDiv.textContent = 'Ошибка сохранения:\n' + errorText;
+                setStatus('Ошибка при сохранении', 'error');
+            }
+        } catch (err) {
+            outputDiv.textContent = err.toString();
+            setStatus('Ошибка при выполнении запроса', 'error');
+        }
+    }
+</script>
+</body>
+</html>
