@@ -3,7 +3,7 @@
 **GPTChatSaver** is an application that
 automatically extracts the contents of a ChatGPT conversation
 from a browser tab (Chrome) and saves it to a local PostgreSQL database
-with further access to it via API.
+with further access to it via WEB-interface.
 
 ---
 
@@ -11,7 +11,7 @@ with further access to it via API.
 
 - Extracting messages using Selenium WebDriver from the ChatGPT tab
 - Saving questions and answers to a local PostgreSQL database
-- REST API for searching and filtering messages in the database
+- WEB interface for searching and show messages
 - Backup and restore of the database
 - CLI menu for managing the application and database (for Windows and Unix)
 
@@ -70,9 +70,9 @@ make menu
 
 ---
 
-### API access
+### WEB access
 
-- **API**: `http://localhost:8080/api/v1/chat`
+- **web**: `http://localhost:8080/index.html`
 
 ---
 
