@@ -28,7 +28,7 @@ public class MessageResource {
 
 
     @PostMapping("/search/question")
-    public ResponseEntity<Response> searchQuestion(@RequestBody String query,
+    public ResponseEntity<Response> searchQuestion(@RequestParam String query,
                                                    @RequestParam(defaultValue = "10") int limit,
                                                    HttpServletRequest request) {
         log.info("Start search question: {}", query);

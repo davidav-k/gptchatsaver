@@ -1,38 +1,155 @@
 body {
-    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #1e1e1e;
+    color: #ffffff;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.tile {
+    background-color: #2c2c2c;
+    border-radius: 12px;
     padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    transition: background-color 0.3s ease;
 }
 
-input[type="text"] {
-    width: 300px;
+.tile:hover {
+    background-color: #383838;
 }
 
-button {
-    margin-left: 10px;
-    padding: 6px 10px;
+.scan-tile {
+    width: 90%;
+    align-self: center;
+    text-align: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: white;
 }
 
-pre {
-    background: #f4f4f4;
-    padding: 10px;
-    white-space: pre-wrap;
+.search-row {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
 }
 
-#status {
-    margin-top: 10px;
-    padding: 8px;
-    border-radius: 4px;
+.search-tile {
+    flex: 1;
+    min-width: 300px;
+    max-width: 48%;
+}
+
+.search-tile label {
+    display: block;
+    margin-bottom: 8px;
     font-weight: bold;
 }
 
-.loading {
-    color: #0055cc;
+.search-tile input {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    background-color: #444;
+    color: #fff;
 }
 
-.success {
-    color: #2e7d32;
+.search-tile button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    background-color: #0077cc;
+    color: #fff;
+    cursor: pointer;
+}
+
+.result-tile {
+    min-height: 200px;
+}
+
+#results-content {
+    margin-top: 10px;
+    white-space: pre-wrap;
+}
+
+.question {
+    font-size: 1.1em;
+    margin-bottom: 8px;
+    color: #87cefa;
+}
+
+.gpt-answer-box {
+    background-color: #2d2d2d;
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 10px;
+}
+
+.gpt-answer-box.hidden {
+    display: none;
+}
+
+.toggle-btn {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    background-color: #3a3a3a;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.copy-btn {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    background: #3a3a3a;
+    border: none;
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+.copy-btn:hover {
+    opacity: 1;
+}
+.loading {
+    color: #ccc;
+    font-style: italic;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.4; }
+    100% { opacity: 1; }
+}
+
+.pretty-json {
+    background-color: #1a1a1a;
+    padding: 12px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-family: monospace;
+    white-space: pre;
+    color: #8ec07c;
 }
 
 .error {
-    color: #c62828;
+    color: #ff6b6b;
 }
