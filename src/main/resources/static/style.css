@@ -27,7 +27,7 @@ body {
     background-color: #383838;
 }
 
-.scan-tile {
+.scan-tile, .all-tile {
     width: 90%;
     align-self: center;
     text-align: center;
@@ -103,12 +103,12 @@ body {
 .toggle-btn {
     margin-top: 10px;
     margin-bottom: 10px;
-    background-color: #3a3a3a;
     border: none;
     padding: 6px 12px;
     border-radius: 6px;
     color: #fff;
     cursor: pointer;
+    background-color: #2c2c2c;
 }
 
 .copy-btn {

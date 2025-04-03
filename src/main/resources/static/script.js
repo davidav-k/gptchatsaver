@@ -22,6 +22,32 @@ document.getElementById('scan-button').addEventListener('click', () => {
         });
 });
 
+document.getElementById('all-button').addEventListener('click', () => {
+    fetch(`${API_BASE}/all`, { method: 'GET' })
+        .then(res => res.json())
+        .then(data => {
+            const messages = data.data?.messages || [];
+
+            if (messages.length === 0) {
+                showResults('<p>Ничего не найдено.</p>');
+            } else {
+                const html = messages
+                    .map(m => `
+            <div class="qa-block">
+              <div class="question"> ${escapeHtml(m.question)}</div>
+              <button class="toggle-btn" onclick="toggleAnswer(this)">Свернуть</button>
+              <div class="gpt-answer-box">${m.answerHtml}</div>
+            </div>
+          `)
+                    .join('');
+                showResults(html);
+            }
+        })
+        .catch(err => {
+            showResults(`<pre>Ошибка при поиске:\n${err}</pre>`);
+        });
+});
+
 function formatJson(obj) {
     return JSON.stringify(obj, null, 2)
         .replace(/&/g, '&amp;')

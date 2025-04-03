@@ -62,4 +62,19 @@ public class MessageResource {
                 HttpStatus.OK));
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<Response> getAll(HttpServletRequest request) {
+        log.info("Start get all messages");
+        List<ChatMessage> messages = chatSearchService.getAll();
+        List<ChatMessageDTO> messageDTOs = messages.stream()
+                .map(DTOMapper::toDTO)
+                .toList();
+
+        return ResponseEntity.ok().body(RequestUtils.getResponse(
+                request,
+                Map.of("messages", messageDTOs),
+                "Found successful into database.",
+                HttpStatus.OK));
+    }
+
 }

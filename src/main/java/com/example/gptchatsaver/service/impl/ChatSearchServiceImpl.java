@@ -25,4 +25,10 @@ public class ChatSearchServiceImpl implements ChatSearchService {
         return chatMessageRepository.searchAnswer(query, limit);
     }
 
+    @Override
+    public List<ChatMessage> getAll() {
+
+        return chatMessageRepository.findAll();
+    }
+
 }
