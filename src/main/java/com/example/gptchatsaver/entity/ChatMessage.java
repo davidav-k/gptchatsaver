@@ -21,17 +21,19 @@ public class ChatMessage {
     @JoinColumn(name = "chat_session_id", nullable = false)
     private ChatSession chatSession;
 
-    private String sender;
+    private String modelSlug;
     private String title;
 
+    private Integer turnIndex;
+    private String questionId;
+    private String answerId;
     @Column(columnDefinition = "TEXT")
     private String question;
-
     @Column(columnDefinition = "TEXT")
     private String answer;
-
     @Column(columnDefinition = "TEXT")
     private String answerHtml;
 
     private LocalDateTime timestamp;
+
 }

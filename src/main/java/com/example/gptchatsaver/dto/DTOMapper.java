@@ -25,9 +25,12 @@ public class DTOMapper {
         }
         return ChatMessageDTO.builder()
                 .id(chatMessage.getId())
-                .sender(chatMessage.getSender())
                 .title(chatMessage.getTitle())
+                .modelSlug(chatMessage.getModelSlug())
+                .turnIndex(chatMessage.getTurnIndex())
+                .questionId(chatMessage.getQuestionId())
                 .question(chatMessage.getQuestion())
+                .answerId(chatMessage.getAnswerId())
                 .answer(chatMessage.getAnswer())
                 .answerHtml(chatMessage.getAnswerHtml())
                 .timestamp(chatMessage.getTimestamp())

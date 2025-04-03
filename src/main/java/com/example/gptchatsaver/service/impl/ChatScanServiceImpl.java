@@ -10,6 +10,8 @@ import com.example.gptchatsaver.service.ChatScanService;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -17,10 +19,11 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.stereotype.Service;
 
+
+
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -87,7 +90,6 @@ public class ChatScanServiceImpl implements ChatScanService {
         String titleChat = driver.getTitle();
 
         try {
-            // Прокрутка страницы до конца
             JavascriptExecutor js = (JavascriptExecutor) driver;
             long lastHeight = (long) js.executeScript("return document.body.scrollHeight");
 
@@ -99,53 +101,51 @@ public class ChatScanServiceImpl implements ChatScanService {
                 lastHeight = newHeight;
             }
 
-            // Явное ожидание появления article-блоков
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
             wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("article[data-testid]")));
 
             List<WebElement> articleElements = driver.findElements(By.cssSelector("article[data-testid]"));
             log.info("🔍 Найдено article-блоков: {}", articleElements.size());
 
-            for (int i = 0; i < articleElements.size() - 1; i += 2) {
+            for (int i = 0, turnIndex = 0; i < articleElements.size() - 1; i += 2, turnIndex++) {
                 WebElement questionBlock = articleElements.get(i);
                 WebElement answerBlock = articleElements.get(i + 1);
 
-                // Вопрос
-                String question = "";
                 try {
-                    question = questionBlock.getText();
-                } catch (Exception e) {
-                    log.warn("Не удалось извлечь вопрос из блока {}", i);
-                    continue;
-                }
+                    // Вопрос
+                    String question = questionBlock.getText().trim();
+                    String questionId = questionBlock.findElement(By.cssSelector("div[data-message-author-role='user']"))
+                            .getAttribute("data-message-id");
 
-                // Ответ и HTML
-                String answer = "";
-                String answerHtml = "";
-                try {
+                    // Ответ
                     WebElement markdown = answerBlock.findElement(By.cssSelector("div.markdown"));
-                    answer = markdown.getText().replaceAll("\\s+", " ");
-                    answerHtml = markdown.getAttribute("outerHTML");
-                } catch (NoSuchElementException e) {
-                    log.warn("Ответ отсутствует в блоке {}", i + 1);
-                    continue;
-                }
+                    String answer = markdown.getText().trim().replaceAll("\\s+", " ");
+                    String answerHtml = cleanAnswerHtml(markdown.getAttribute("outerHTML"));
 
-                // Проверка на дублирование
-                if (!messageExists(titleChat, question)) {
-                    ChatMessage chatMessage = ChatMessage.builder()
-                            .chatSession(chatSession)
-                            .sender("ChatGPT")
-                            .title(titleChat)
-                            .question(question)
-                            .answer(answer)
-                            .answerHtml(answerHtml)
-                            .timestamp(LocalDateTime.now())
-                            .build();
-                    chatMessageRepository.save(chatMessage);
-                    log.info("Сохранено сообщение: {}", question);
-                } else {
-                    log.info("Сообщение уже существует. Пропуск: {}", question);
+                    String modelSlug = answerBlock.findElement(By.cssSelector("div[data-message-model-slug]"))
+                            .getAttribute("data-message-model-slug");
+
+                    String answerId = answerBlock.findElement(By.cssSelector("div[data-message-author-role='assistant']"))
+                            .getAttribute("data-message-id");
+
+                    if (!messageExists(titleChat, question)) {
+                        ChatMessage chatMessage = ChatMessage.builder()
+                                .chatSession(chatSession)
+                                .title(titleChat)
+                                .question(question)
+                                .questionId(questionId)
+                                .answer(answer)
+                                .answerHtml(answerHtml)
+                                .answerId(answerId)
+                                .modelSlug(modelSlug)
+                                .turnIndex(turnIndex)
+                                .timestamp(LocalDateTime.now())
+                                .build();
+                        chatMessageRepository.save(chatMessage);
+                        log.info("💾 Сохранено сообщение: {}", question.substring(0, Math.min(20, question.length())) + "...");
+                    }
+                } catch (Exception e) {
+                    log.warn("Ошибка при обработке пар блоков {} и {}: {}", i, i + 1, e.getMessage());
                 }
             }
 
@@ -154,41 +154,18 @@ public class ChatScanServiceImpl implements ChatScanService {
         }
     }
 
-
-//    private void createChatMessages(WebDriver driver, ChatSession chatSession) {
-//        String titleChat = driver.getTitle();
-//        List<WebElement> articleElements = driver.findElements(By.cssSelector("article[data-testid]"));
-//
-//        for (int i = 0; i < articleElements.size(); i += 2) {
-//            String question = articleElements.get(i)
-//                    .findElement(By.xpath(".//div//div//div//div//div//div//div//div//div//div"))
-//                    .getText();
-//            String answer = articleElements.get(i + 1)
-//                    .findElement(By.cssSelector("div.markdown"))
-//                    .getText()
-//                    .replaceAll("\\s+", " ");
-//            String answerHtml = Objects.requireNonNull(articleElements.get(i + 1)
-//                            .findElement(By.cssSelector("div.markdown"))
-//                            .getAttribute("outerHTML"))
-//                    .replaceAll("\\s+", " ")
-//            if (!messageExists(titleChat, question)) {
-//                ChatMessage chatMessage = ChatMessage.builder()
-//                        .chatSession(chatSession)
-//                        .sender("ChatGPT")
-//                        .title(titleChat)
-//                        .question(question)
-//                        .answer(answer)
-//                        .answerHtml(answerHtml)
-//                        .timestamp(LocalDateTime.now())
-//                        .build();
-//                chatMessageRepository.save(chatMessage);
-//            } else {
-//                log.info("Сообщение уже существует. Пропуск.");
-//            }
-//        }
-//    }
-
     private boolean messageExists(String title, String question) {
         return chatMessageRepository.existsByTitleAndQuestion(title, question);
+    }
+
+    public String cleanAnswerHtml(String rawHtml) {
+        Document doc = Jsoup.parseBodyFragment(rawHtml);
+
+        // Удаляем элементы по классу
+        doc.select("div.sticky").remove(); // Кнопки "Copy", "Edit"
+        doc.select("div[aria-label=Copy]").remove(); // На всякий случай
+
+        // Можно добавить другие div'ы, если нужно
+        return doc.body().html();
     }
 }

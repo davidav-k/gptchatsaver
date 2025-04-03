@@ -17,4 +17,9 @@ public class ChatSessionDTO {
     private LocalDateTime createdAt;
     private String aiModelVersion;
     private int countMessages;
+
+
+
+
+
 }

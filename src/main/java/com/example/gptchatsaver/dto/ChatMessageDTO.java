@@ -13,8 +13,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ChatMessageDTO {
     private Long id;
-    private String sender;
     private String title;
+    private String modelSlug;
+    private Integer turnIndex;
+    private String questionId;
+    private String answerId;
     private String question;
     private String answer;
     private String answerHtml;
