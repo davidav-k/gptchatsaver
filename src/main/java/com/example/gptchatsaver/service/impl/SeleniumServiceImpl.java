@@ -3,6 +3,9 @@ package com.example.gptchatsaver.service.impl;
 import com.example.gptchatsaver.entity.AIModel;
 import com.example.gptchatsaver.entity.ChatMessage;
 import com.example.gptchatsaver.entity.ChatSession;
+
+import static com.example.gptchatsaver.constant.ConstantsForScanning.*;
+
 import com.example.gptchatsaver.exception.ScanningException;
 import com.example.gptchatsaver.service.SeleniumService;
 import io.github.bonigarcia.wdm.WebDriverManager;
@@ -32,19 +35,6 @@ public class SeleniumServiceImpl implements SeleniumService {
     @Value("${chrome-port}")
     private String chromePort;
 
-    private final String CHATGPT = "chatgpt";
-    private final String SELECTOR_MODEL_VERSION = "button[aria-haspopup=menu] div span";
-    private final String SELECTOR_MODEL_SLUG = "div[data-message-model-slug]";
-    private final String ATTRIBUTE_MODEL_SLUG = "data-message-model-slug";
-    private final String PROVIDER = "OpenAI";
-    private final String SELECTOR_ARTICLE_ELEMENT = "article[data-testid]";
-    private final String SELECTOR_QUESTION_ID = "div[data-message-author-role='user']";
-    private final String ATTRIBUTE_QUESTION_ID = "data-message-id";
-    private final String SELECTOR_ANSWER_ID = "div[data-message-author-role='assistant']";
-    private final String ATTRIBUTE_ANSWER_ID = "data-message-id";
-    private final String SELECTOR_ANSWER = "div.markdown";
-
-
     @Override
     public WebDriver initDriver() {
         WebDriverManager.chromedriver().setup();
@@ -53,7 +43,7 @@ public class SeleniumServiceImpl implements SeleniumService {
         try {
             WebDriver driver = new ChromeDriver(options);
             return switchToRequiredWindow(driver);
-        }catch (WebDriverException ex){
+        } catch (WebDriverException ex) {
             throw new ScanningException("Failed to initialize WebDriver", ex);
         }
     }

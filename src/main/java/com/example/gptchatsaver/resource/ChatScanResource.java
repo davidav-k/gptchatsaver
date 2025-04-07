@@ -33,7 +33,7 @@ public class ChatScanResource {
             return ResponseEntity.created(URI.create("")).body(RequestUtils.getResponse(
                     request,
                     emptyMap(),
-                    "Сканирование чата завершено успешно",
+                    "Chat scan completed successfully",
                     HttpStatus.CREATED));
         } catch (Exception ex) {
             return ResponseEntity.ok().body(RequestUtils.getErrorResponse(

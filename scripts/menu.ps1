@@ -1,5 +1,3 @@
-# scripts/menu.ps1 — Interactive project menu (PowerShell version)
-
 function Show-Menu {
     Clear-Host
     Write-Host "===== GPTChatSaver Project Menu (PowerShell) ====="
