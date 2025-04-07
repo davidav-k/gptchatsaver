@@ -25,6 +25,6 @@ public class ChatSession {
     @JoinColumn(name = "ai_model_id", nullable = false)
     private AIModel aiModel;
 
-    @OneToMany(mappedBy = "chatSession", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "chatSession", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ChatMessage> messages;
 }

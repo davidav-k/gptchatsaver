@@ -19,7 +19,7 @@ with further access to it via WEB-interface.
 
 ## Technology stack
 
-- **Java 21**, **Spring Boot 3**, **Spring Data JPA**
+- **Java 17**, **Spring Boot 3**, **Spring Data JPA**
 - **PostgreSQL** (via Docker)
 - **Selenium WebDriver**
 - **Docker + Docker Compose**

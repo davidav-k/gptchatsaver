@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;
 
-public interface AiModelRepository extends JpaRepository<AIModel, UUID> {
+public interface AiModelRepository extends JpaRepository<AIModel, Long> {
 }

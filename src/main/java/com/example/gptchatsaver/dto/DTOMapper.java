@@ -13,7 +13,7 @@ public class DTOMapper {
         }
         return AIModelDTO.builder()
                 .id(aiModel.getId())
-                .name(aiModel.getName())
+                .modelSlug(aiModel.getModelSlug())
                 .version(aiModel.getVersion())
                 .provider(aiModel.getProvider())
                 .build();
@@ -26,7 +26,6 @@ public class DTOMapper {
         return ChatMessageDTO.builder()
                 .id(chatMessage.getId())
                 .title(chatMessage.getTitle())
-                .modelSlug(chatMessage.getModelSlug())
                 .turnIndex(chatMessage.getTurnIndex())
                 .questionId(chatMessage.getQuestionId())
                 .question(chatMessage.getQuestion())

@@ -38,3 +38,4 @@ api:
   endpoint:
     base-url: ${BASE_URL}
 
+chrome-port: ${CHROME_PORT:9222}

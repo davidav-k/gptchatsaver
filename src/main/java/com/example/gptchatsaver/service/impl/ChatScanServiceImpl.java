@@ -17,9 +17,8 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -36,10 +35,13 @@ public class ChatScanServiceImpl implements ChatScanService {
     private final ChatSessionRepository chatSessionRepository;
     private final AiModelRepository aiModelRepository;
 
+    @Value("${chrome-port}")
+    private String chromePort;
+
     public void scanChat() {
         WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
-        options.setExperimentalOption("debuggerAddress", "localhost:9222");
+        options.setExperimentalOption("debuggerAddress", "localhost:" + chromePort);
         WebDriver driver = new ChromeDriver(options);
 
         try {
@@ -65,11 +67,11 @@ public class ChatScanServiceImpl implements ChatScanService {
         throw new RuntimeException("Not found ChatGPT's window");
     }
 
-
     private AIModel createAIModel(WebDriver driver) {
         List<WebElement> elementVersionChats = driver.findElements(By.cssSelector("button[aria-haspopup=menu] div span"));
         AIModel aiModel = AIModel.builder()
-                .name("ChatGPT")
+                .modelSlug(driver.findElement(By.cssSelector("div[data-message-model-slug]"))
+                                .getAttribute("data-message-model-slug"))
                 .version(elementVersionChats.get(1).getText().trim())
                 .provider("OpenAI")
                 .build();
@@ -85,7 +87,6 @@ public class ChatScanServiceImpl implements ChatScanService {
         return chatSessionRepository.save(chatSession);
     }
 
-
     private void createChatMessages(WebDriver driver, ChatSession chatSession) {
         String titleChat = driver.getTitle();
 
@@ -95,7 +96,7 @@ public class ChatScanServiceImpl implements ChatScanService {
 
             while (true) {
                 js.executeScript("window.scrollTo(0, document.body.scrollHeight);");
-                Thread.sleep(1000);
+
                 long newHeight = (long) js.executeScript("return document.body.scrollHeight");
                 if (newHeight == lastHeight) break;
                 lastHeight = newHeight;
@@ -122,8 +123,7 @@ public class ChatScanServiceImpl implements ChatScanService {
                     String answer = markdown.getText().trim().replaceAll("\\s+", " ");
                     String answerHtml = cleanAnswerHtml(markdown.getAttribute("outerHTML"));
 
-                    String modelSlug = answerBlock.findElement(By.cssSelector("div[data-message-model-slug]"))
-                            .getAttribute("data-message-model-slug");
+
 
                     String answerId = answerBlock.findElement(By.cssSelector("div[data-message-author-role='assistant']"))
                             .getAttribute("data-message-id");
@@ -131,13 +131,13 @@ public class ChatScanServiceImpl implements ChatScanService {
                     if (!messageExists(titleChat, question)) {
                         ChatMessage chatMessage = ChatMessage.builder()
                                 .chatSession(chatSession)
+                                .aiModel(chatSession.getAiModel())
                                 .title(titleChat)
                                 .question(question)
                                 .questionId(questionId)
                                 .answer(answer)
                                 .answerHtml(answerHtml)
                                 .answerId(answerId)
-                                .modelSlug(modelSlug)
                                 .turnIndex(turnIndex)
                                 .timestamp(LocalDateTime.now())
                                 .build();

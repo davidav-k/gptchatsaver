@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AIModelDTO {
     private Long id;
-    private String name;
+    private String modelSlug;
     private String version;
     private String provider;
 }

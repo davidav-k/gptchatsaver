@@ -16,14 +16,13 @@ public class ChatMessage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @ManyToOne
     @JoinColumn(name = "chat_session_id", nullable = false)
     private ChatSession chatSession;
-
-    private String modelSlug;
+    @ManyToOne
+    @JoinColumn(name = "ai_model_id", nullable = false)
+    private AIModel aiModel;
     private String title;
-
     private Integer turnIndex;
     private String questionId;
     private String answerId;
