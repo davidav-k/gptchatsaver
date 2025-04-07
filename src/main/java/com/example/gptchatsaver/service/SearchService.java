@@ -4,7 +4,7 @@ import com.example.gptchatsaver.entity.ChatMessage;
 
 import java.util.List;
 
-public interface ChatSearchService {
+public interface SearchService {
 
     List<ChatMessage> searchQuestion(String query, int limit);
 

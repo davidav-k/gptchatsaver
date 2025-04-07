@@ -4,6 +4,7 @@ package com.example.gptchatsaver.utils;
 import com.example.gptchatsaver.domen.Response;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.experimental.UtilityClass;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
@@ -13,11 +14,11 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-
+@UtilityClass
 public class RequestUtils {
 
 
-    public static Response getResponse(HttpServletRequest request,
+    public Response getResponse(HttpServletRequest request,
                                        Map<?, ?> data,
                                        String message,
                                        HttpStatus status) {
@@ -31,7 +32,7 @@ public class RequestUtils {
                 data);
     }
 
-    public static Response getErrorResponse(HttpServletRequest request,
+    public Response getErrorResponse(HttpServletRequest request,
                                              HttpServletResponse response,
                                              Exception exception,
                                              HttpStatus status) {

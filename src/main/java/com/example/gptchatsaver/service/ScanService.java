@@ -1,6 +1,6 @@
 package com.example.gptchatsaver.service;
 
-public interface ChatScanService {
+public interface ScanService {
 
     void scanChat();
 

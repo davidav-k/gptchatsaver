@@ -5,7 +5,7 @@ import com.example.gptchatsaver.domen.Response;
 import com.example.gptchatsaver.dto.ChatMessageDTO;
 import com.example.gptchatsaver.dto.DTOMapper;
 import com.example.gptchatsaver.entity.ChatMessage;
-import com.example.gptchatsaver.service.ChatSearchService;
+import com.example.gptchatsaver.service.SearchService;
 import com.example.gptchatsaver.utils.RequestUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ import java.util.Map;
 public class MessageResource {
 
 
-    private final ChatSearchService chatSearchService;
+    private final SearchService searchService;
 
 
     @PostMapping("/search/question")
@@ -32,7 +32,7 @@ public class MessageResource {
                                                    @RequestParam(defaultValue = "10") int limit,
                                                    HttpServletRequest request) {
         log.info("Start search question: {}", query);
-        List<ChatMessage> messages = chatSearchService.searchQuestion(query, limit);
+        List<ChatMessage> messages = searchService.searchQuestion(query, limit);
         List<ChatMessageDTO> messageDTOs = messages.stream()
                 .map(DTOMapper::toDTO)
                 .toList();
@@ -50,7 +50,7 @@ public class MessageResource {
                                                  @RequestParam(defaultValue = "10") int limit,
                                                  HttpServletRequest request) {
         log.info("Start search answer: {}", query);
-        List<ChatMessage> messages = chatSearchService.searchAnswer(query, limit);
+        List<ChatMessage> messages = searchService.searchAnswer(query, limit);
         List<ChatMessageDTO> messageDTOs = messages.stream()
                 .map(DTOMapper::toDTO)
                 .toList();
@@ -65,7 +65,7 @@ public class MessageResource {
     @GetMapping("/all")
     public ResponseEntity<Response> getAll(HttpServletRequest request) {
         log.info("Start get all messages");
-        List<ChatMessage> messages = chatSearchService.getAll();
+        List<ChatMessage> messages = searchService.getAll();
         List<ChatMessageDTO> messageDTOs = messages.stream()
                 .map(DTOMapper::toDTO)
                 .toList();

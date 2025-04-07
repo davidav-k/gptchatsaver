@@ -1,7 +1,7 @@
 package com.example.gptchatsaver.resource;
 
 import com.example.gptchatsaver.domen.Response;
-import com.example.gptchatsaver.service.ChatScanService;
+import com.example.gptchatsaver.service.ScanService;
 import com.example.gptchatsaver.utils.RequestUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,13 +22,13 @@ import static java.util.Collections.emptyMap;
 @RequiredArgsConstructor
 public class ChatScanResource {
 
-    private final ChatScanService chatScanService;
+    private final ScanService scanService;
 
     @PostMapping("/scan")
     public ResponseEntity<Response> scanChat(HttpServletRequest request, HttpServletResponse response) {
         log.info("Start scan chat");
         try {
-            chatScanService.scanChat();
+            scanService.scanChat();
 
             return ResponseEntity.created(URI.create("")).body(RequestUtils.getResponse(
                     request,
