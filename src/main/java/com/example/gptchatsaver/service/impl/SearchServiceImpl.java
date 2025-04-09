@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -18,13 +19,19 @@ public class SearchServiceImpl implements SearchService {
     @Transactional
     @Override
     public List<ChatMessage> searchQuestion(String query, int limit) {
-        Pageable pageable = Pageable.ofSize(limit);
+        if (limit <= 0) {
+            return Collections.emptyList();
+        }
 
+        Pageable pageable = Pageable.ofSize(limit);
         return chatMessageRepository.searchQuestionPaginated(query, pageable).getContent();
     }
 
     @Override
     public List<ChatMessage> searchAnswer(String query, int limit) {
+        if (limit <= 0) {
+            return Collections.emptyList();
+        }
         Pageable pageable = Pageable.ofSize(limit);
 
         return chatMessageRepository.searchAnswerPaginated(query, pageable).getContent();

@@ -41,14 +41,14 @@ public class SeleniumServiceImpl implements SeleniumService {
         ChromeOptions options = new ChromeOptions();
         options.setExperimentalOption("debuggerAddress", "localhost:" + chromePort);
         try {
-            WebDriver driver = new ChromeDriver(options);
+            WebDriver driver = createChromeDriver(options);
             return switchToRequiredWindow(driver);
         } catch (WebDriverException ex) {
             throw new ScanningException("Failed to initialize WebDriver", ex);
         }
     }
 
-    private WebDriver switchToRequiredWindow(WebDriver driver) {
+    protected WebDriver switchToRequiredWindow(WebDriver driver) {
         Set<String> windowHandles = driver.getWindowHandles();
         for (String handle : windowHandles) {
             driver.switchTo().window(handle);
@@ -247,4 +247,7 @@ public class SeleniumServiceImpl implements SeleniumService {
         }
     }
 
+    protected ChromeDriver createChromeDriver(ChromeOptions options) {
+        return new ChromeDriver(options);
+    }
 }
